@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.tag.dao.TgTagDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.tag.entity.TgTagEntity" id="tgTagMap">
+        <result property="id" column="ID"/>
+        <result property="pid" column="PID"/>
+        <result property="name" column="NAME"/>
+        <result property="cname" column="CNAME"/>
+        <result property="tagGroupId" column="TAG_GROUP_ID"/>
+        <result property="status" column="STATUS"/>
+        <result property="isRoutine" column="IS_ROUTINE"/>
+        <result property="cronExpress" column="CRON_EXPRESS"/>
+        <result property="baseTime" column="BASE_TIME"/>
+        <result property="unit" column="UNIT"/>
+        <result property="dataType" column="DATA_TYPE"/>
+        <result property="sourceType" column="SOURCE_TYPE"/>
+        <result property="accessPermission" column="ACCESS_PERMISSION"/>
+        <result property="ruleContent" column="RULE_CONTENT"/>
+        <result property="sort" column="SORT"/>
+        <result property="cnameColor" column="CNAME_COLOR"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="sqlContent" column="SQL_CONTENT"/>
+    </resultMap>
+
+    <sql id="tgTagColumn">
+        ID,PID,NAME,CNAME,TAG_GROUP_ID,STATUS,IS_ROUTINE,CRON_EXPRESS,BASE_TIME,UNIT,DATA_TYPE,SOURCE_TYPE,
+        ACCESS_PERMISSION,RULE_CONTENT,SORT,CREATE_BY,CREATE_TIME,UPDATE_BY,UPDATE_TIME,REMARK,CNAME_COLOR,SQL_CONTENT
+    </sql>
+
+    <update id="updateSort">
+        update TG_TAG set SORT =#{sort}  where ID=#{id}
+    </update>
+
+    <select id="findPTagList" resultType="com.kuangheng.cloud.tag.entity.TgTagEntity">
+        SELECT
+            <include refid="tgTagColumn"/>
+        FROM TG_TAG
+        <where>
+            <if test="isAll !=null and !isAll">
+                AND (PID IS NULL OR PID='')
+            </if>
+            <if test="isAll !=null and isAll and pid !=null and pid !=''">
+                AND PID = #{pid}
+            </if>
+            <if test="userId !=null and userId!=''">
+                AND CREATE_BY = #{userId}
+            </if>
+        </where>
+    </select>
+
+    <select id="findTagByDataTagIdList" resultType="com.kuangheng.cloud.tag.entity.TgTagEntity">
+        SELECT <include refid="tgTagColumn"/> FROM (
+            SELECT
+                DISTINCT t.*
+            FROM
+                TG_TAG_DATA h JOIN TG_TAG t ON t.ID = h.TAG_ID
+            WHERE
+                t.CREATE_BY = #{userId}
+                AND h.ID IN
+                    <foreach collection="dataTagIdList" open="(" close=")" item="dataTagId" separator=",">#{dataTagId}</foreach>
+        ) t1 LIMIT 10
+    </select>
+
+</mapper>

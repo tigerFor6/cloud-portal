@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.customer.dao.CustomerServiceDao">
+
+    <select id="findAll" resultType="com.kuangheng.cloud.customer.entity.CustomerServiceEntity">
+        SELECT
+            T1.*
+        FROM customer_service T1
+        <where>
+            <if test="map.id !=null and !map.id">
+                AND T1.ID = #{map.id}
+            </if>
+            <if test="map.customerId !=null and !map.customerId">
+                AND T1.CUSTOMER_ID = #{map.customerId}
+            </if>
+            <if test="map.action !=null and !map.action">
+                AND T1.ACTION = #{map.action}
+            </if>
+            <if test="map.type !=null and !map.type">
+                AND T1.TYPE = #{map.type}
+            </if>
+            <if test="map.dataForm !=null and !map.dataForm">
+                AND T1.DATA_FORM = #{map.dataForm}
+            </if>
+        </where>
+        ORDER BY T1.CREATE_TIME DESC
+    </select>
+</mapper>

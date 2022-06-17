@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.customer.dao.ChatInfoDao">
+
+    <select id="findAll" resultType="com.kuangheng.cloud.customer.entity.ChatInfoEntity">
+        SELECT
+            T1.*
+        FROM chat_info T1
+        <where>
+            <if test="map.id !=null and !map.id">
+                AND T1.ID = #{map.id}
+            </if>
+            <if test="map.customerId !=null and !map.customerId">
+                AND T1.CUSTOMER_ID = #{map.customerId}
+            </if>
+            <if test="map.chatId !=null and !map.chatId">
+                AND T1.CHAT_ID = #{map.chatId}
+            </if>
+            <if test="map.chatName !=null and !map.chatName">
+                AND T1.CHAT_NAME = #{map.chatName}
+            </if>
+            <if test="map.chatLeader !=null and !map.chatLeader">
+                AND T1.CHAT_LEADER = #{map.chatLeader}
+            </if>
+        </where>
+        ORDER BY T1.CREATE_TIME DESC
+    </select>
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.metadata.dao.MetEventDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.metadata.entity.MetEventEntity" id="metEventMap">
+        <result property="id" column="ID"/>
+        <result property="project" column="PROJECT"/>
+        <result property="name" column="NAME"/>
+        <result property="cname" column="CNAME"/>
+        <result property="reported" column="REPORTED"/>
+        <result property="visible" column="VISIBLE"/>
+        <result property="received" column="RECEIVED"/>
+        <result property="platform" column="PLATFORM"/>
+        <result property="tag" column="TAG"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="dbTabAlias" column="DB_TAB_ALIAS"/>
+        <result property="relationFlag" column="RELATION_FLAG"/>
+    </resultMap>
+
+    <sql id="metEventColumn">
+        ID,PROJECT,NAME,CNAME,REPORTED,VISIBLE,RECEIVED,PLATFORM,TAG,CREATE_BY,CREATE_TIME,UPDATE_BY,UPDATE_TIME,REMARK,DB_TAB_ALIAS,RELATION_FLAG
+    </sql>
+
+    <select id="eventList" resultType="com.kuangheng.cloud.metadata.entity.MetEventEntity">
+        SELECT <include refid="metEventColumn"/> FROM MET_EVENT
+        WHERE VISIBLE = true
+    </select>
+
+</mapper>

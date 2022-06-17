@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuangheng.cloud.dao.NoticeDao">
+
+    <select id="touch" resultType="com.kuangheng.cloud.entity.Notice">
+        select DISTINCT
+            N.ID, C.NAME as CATALOG_NAME, N.SUBJECT, U.NAME as CREATE_BY_NAME, N.CREATE_TIME, N.RESULT
+        from MSG_NOTICE N
+            left join MSG_NOTICE_CATALOG C on C.ID=N.CATALOG_ID
+            left join SYS_USER U on U.ID=N.CREATE_BY
+            left join MSG_NOTICE_ROLE R ON R.NOTICE_ID = N.ID
+            left join MSG_NOTICE_USER R2 ON R2.NOTICE_ID = N.ID
+        where
+            N.STATUS=1
+            and
+            (N.DEPRECATED_TIME is null or N.DEPRECATED_TIME &gt; now())
+            and (
+                (N.DELAY_TIME is not null and N.DELAY_TIME &lt; now() and N.DELAY_TIME &gt; #{timestamp})
+                or
+                (N.DELAY_TIME is null and N.CREATE_TIME &gt; #{timestamp})
+            )
+            and (
+                R2.USER_ID=#{userId}
+                or
+                R.ROLE_ID in
+                <foreach item="role" index="index" collection="roles" open="(" separator="," close=")">
+                    #{role}
+                </foreach>
+            )
+            and (
+                select count(*) from MSG_NOTICE_READ L where L.USER_Id=#{userId} and L.NOTICE_ID=N.ID
+                ) &lt; 1
+            order by N.CREATE_TIME desc
+    </select>
+
+    <select id="list" resultType="com.kuangheng.cloud.entity.Notice">
+        select
+        N.ID, C.NAME as CATALOG_NAME, N.SUBJECT, U.NAME as CREATE_BY_NAME, N.CREATE_TIME, N.RESULT,
+        N.PRIORITY, N.REPLYABLE,
+        (select count(*) from MSG_NOTICE_READ where NOTICE_ID=N.ID and USER_ID=#{userId}) as READ_FLAG,
+        (select count(*) from MSG_NOTICE_READ where NOTICE_ID=N.ID) as READ_COUNT,
+        (select count(*) from MSG_NOTICE_REPLY where NOTICE_ID=N.ID) as REPLY_COUNT,
+        (select count(*) from MSG_NOTICE_ATTACH where NOTICE_ID=N.ID) as ATTACH_COUNT
+        from MSG_NOTICE N
+        left join MSG_NOTICE_CATALOG C on C.ID=N.CATALOG_ID
+        left join SYS_USER U on U.ID=N.CREATE_BY
+        where
+        N.STATUS=1
+        and
+        (N.DEPRECATED_TIME is null or N.DEPRECATED_TIME &gt; now())
+        and
+        (N.DELAY_TIME is null or N.DELAY_TIME &lt; now())
+        and (
+        (select count(*)
+        from MSG_NOTICE_USER
+        where
+        NOTICE_ID=N.ID
+        and
+        USER_ID=#{userId}
+        ) &gt; 0
+        or
+        (select count(*)
+        from MSG_NOTICE_ROLE
+        where
+        NOTICE_ID=N.ID
+        and
+        ROLE_ID in
+        <foreach item="role" index="index" collection="roles" open="(" separator="," close=")">
+            #{role}
+        </foreach>
+        ) &gt; 0
+        )
+        order by N.CREATE_TIME desc
+    </select>
+
+    <select id="listRead" resultType="com.kuangheng.cloud.entity.Notice">
+        select
+        N.ID, C.NAME as CATALOG_NAME, N.SUBJECT, U.NAME as CREATE_BY_NAME, N.CREATE_TIME,N.RESULT,
+        N.READ_COUNT, N.REPLY_COUNT, N.PRIORITY, N.REPLYABLE,
+        (select count(*) from MSG_NOTICE_READ where NOTICE_ID=N.ID) as READ_COUNT,
+        (select count(*) from MSG_NOTICE_REPLY where NOTICE_ID=N.ID) as REPLY_COUNT,
+        (select count(*) from MSG_NOTICE_ATTACH where NOTICE_ID=N.ID) as ATTACH_COUNT,
+        1 as READ_FLAG
+        from MSG_NOTICE N
+        left join MSG_NOTICE_CATALOG C on C.ID=N.CATALOG_ID
+        left join SYS_USER U on U.ID=N.CREATE_BY
+        where
+        N.STATUS=1
+        and
+        (N.DEPRECATED_TIME is null or N.DEPRECATED_TIME &gt; now())
+        and
+        (N.DELAY_TIME is null or N.DELAY_TIME &lt; now())
+        and (
+        (select count(*)
+        from MSG_NOTICE_USER
+        where
+        NOTICE_ID=N.ID
+        and
+        USER_ID=#{userId}
+        ) &gt; 0
+        or
+        (select count(*)
+        from MSG_NOTICE_ROLE
+        where
+        NOTICE_ID=N.ID
+        and
+        ROLE_ID in
+        <foreach item="role" index="index" collection="roles" open="(" separator="," close=")">
+            #{role}
+        </foreach>
+        ) &gt; 0
+        )
+        and (
+        select count(*) from MSG_NOTICE_READ L where L.USER_Id=#{userId} and L.NOTICE_ID=N.ID
+        ) &gt; 0
+        order by N.CREATE_TIME desc
+    </select>
+    <select id="listUnread" resultType="com.kuangheng.cloud.entity.Notice">
+        select
+        N.ID, C.NAME as CATALOG_NAME, N.SUBJECT, U.NAME as CREATE_BY_NAME, N.CREATE_TIME,N.RESULT,
+        N.READ_COUNT, N.REPLY_COUNT, N.PRIORITY, N.REPLYABLE,
+        (select count(*) from MSG_NOTICE_READ where NOTICE_ID=N.ID) as READ_COUNT,
+        (select count(*) from MSG_NOTICE_REPLY where NOTICE_ID=N.ID) as REPLY_COUNT,
+        (select count(*) from MSG_NOTICE_ATTACH where NOTICE_ID=N.ID) as ATTACH_COUNT,
+        0 as READ_FLAG
+        from MSG_NOTICE N
+        left join MSG_NOTICE_CATALOG C on C.ID=N.CATALOG_ID
+        left join SYS_USER U on U.ID=N.CREATE_BY
+        where
+        N.STATUS=1
+        and
+        (N.DEPRECATED_TIME is null or N.DEPRECATED_TIME &gt; now())
+        and
+        (N.DELAY_TIME is null or N.DELAY_TIME &lt; now())
+        and (
+        (select count(*)
+        from MSG_NOTICE_USER
+        where
+        NOTICE_ID=N.ID
+        and
+        USER_ID=#{userId}
+        ) &gt; 0
+        or
+        (select count(*)
+        from MSG_NOTICE_ROLE
+        where
+        NOTICE_ID=N.ID
+        and
+        ROLE_ID in
+        <foreach item="role" index="index" collection="roles" open="(" separator="," close=")">
+            #{role}
+        </foreach>
+        ) &gt; 0
+        )
+        and (
+        select count(*) from MSG_NOTICE_READ L where L.USER_Id=#{userId} and L.NOTICE_ID=N.ID
+        ) &lt; 1
+        order by N.CREATE_TIME desc
+    </select>
+
+    <select id="getById" resultType="com.kuangheng.cloud.entity.Notice">
+        select
+        N.ID, C.NAME as CATALOG_NAME, N.SUBJECT, N.RECEIVER, U.NAME as CREATE_BY_NAME, N.CREATE_TIME,
+        N.CONTENT, N.PRIORITY, N.REPLYABLE,
+        (select count(*) from MSG_NOTICE_READ where NOTICE_ID=N.ID and USER_ID=#{userId}) as READ_FLAG,
+        (select count(*) from MSG_NOTICE_READ where NOTICE_ID=N.ID) as READ_COUNT,
+        (select count(*) from MSG_NOTICE_REPLY where NOTICE_ID=N.ID) as REPLY_COUNT
+        from MSG_NOTICE N
+        left join MSG_NOTICE_CATALOG C on C.ID=N.CATALOG_ID
+        left join SYS_USER U on U.ID=N.CREATE_BY
+        where
+        N.ID=#{id}
+        and (
+        (select count(*)
+        from MSG_NOTICE_USER
+        where
+        NOTICE_ID=N.ID
+        and
+        USER_ID=#{userId}
+        ) &gt; 0
+        or
+        (select count(*)
+        from MSG_NOTICE_ROLE
+        where
+        NOTICE_ID=N.ID
+        and
+        ROLE_ID in
+        <foreach item="role" index="index" collection="roles" open="(" separator="," close=")">
+            #{role}
+        </foreach>
+        ) &gt; 0
+        )
+    </select>
+
+    <select id="getNoticeByMe" resultType="com.kuangheng.cloud.entity.Notice">
+        select
+            N.ID, C.NAME as CATALOG_NAME, N.SUBJECT, N.CREATE_TIME,
+            1 as READ_FLAG, N.REPLYABLE, N.PRIORITY
+        from MSG_NOTICE N
+        left join MSG_NOTICE_CATALOG C on C.ID=N.CATALOG_ID
+        where
+            N.ID=#{noticeId}
+            and
+            N.CREATE_BY=#{userId}
+    </select>
+
+</mapper>

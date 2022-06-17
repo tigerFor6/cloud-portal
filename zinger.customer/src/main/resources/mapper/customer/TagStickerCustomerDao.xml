@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.customer.dao.TagStickerCustomerDao">
+
+    <resultMap id="tagStickerCustomerMap" type="com.kuangheng.cloud.customer.entity.TagStickerCustomerEntity">
+        <result property="id" column="id"/>
+        <result property="stickerId" column="STICKER_ID"/>
+        <result property="customerId" column="CUSTOMER_ID"/>
+        <result property="userId" column="USER_ID"/>
+    </resultMap>
+
+    <insert id="create" parameterType="java.util.List">
+        INSERT INTO tag_sticker_customer(id, sticker_id, customer_id, user_id)
+        VALUES
+        <foreach collection="list" item="tagStickerCustomer" index="index" separator=",">
+            (#{tagStickerCustomer.id}, #{tagStickerCustomer.stickerId}, #{tagStickerCustomer.customerId}, #{tagStickerCustomer.userId})
+        </foreach>
+    </insert>
+
+    <delete id="removeByRelation">
+        DELETE FROM tag_sticker_customer
+        WHERE STICKER_ID=#{map.stickerId}
+            AND  CUSTOMER_ID=#{map.customerId}
+            AND  USER_ID=#{map.userId}
+    </delete>
+
+    <resultMap id="getStickerNameResultMap" type="java.util.Map">
+        <id column="id" jdbcType="BIGINT" javaType="java.lang.String" property="id" />
+        <result column="name" jdbcType="VARCHAR" javaType="java.lang.String" property="name" />
+        <result column="cname" jdbcType="VARCHAR" javaType="java.lang.String" property="cname" />
+        <result column="tag_group_id" jdbcType="BIGINT" javaType="java.lang.String" property="tagGroupId" />
+        <result column="status" jdbcType="TINYINT" javaType="java.lang.String" property="status" />
+        <result column="access_permission" jdbcType="TINYINT" javaType="java.lang.String" property="accessPermission" />
+        <result column="sort" jdbcType="INTEGER" javaType="java.lang.String" property="sort" />
+        <result column="cname_color" jdbcType="VARCHAR" javaType="java.lang.String" property="cnameColor" />
+        <result column="create_by" jdbcType="BIGINT" javaType="java.lang.String" property="createBy" />
+        <result column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" property="createTime" />
+        <result column="update_by" jdbcType="BIGINT" javaType="java.lang.String" property="updateBy" />
+        <result column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" property="updateTime" />
+        <result column="remark" jdbcType="VARCHAR" javaType="java.lang.String" property="remark" />
+    </resultMap>
+
+    <select id="findAll" resultType="com.kuangheng.cloud.customer.entity.TagStickerCustomerEntity">
+        SELECT
+        T1.*
+        FROM tag_sticker_customer T1
+        <where>
+            <if test="map.id !=null and !map.id">
+                AND T1.ID= #{map.id}
+            </if>
+            <if test="map.stickerId !=null and !map.stickerId">
+                AND T1.STICKER_ID= #{map.stickerId}
+            </if>
+            <if test="map.userId !=null and !map.userId">
+                AND T1.USER_ID= #{map.userId}
+            </if>
+            <if test="map.customerId !=null and !map.customerId">
+                AND T1.CUSTOMER_ID= #{map.customerId}
+            </if>
+        </where>
+        ORDER BY T1.ID DESC
+    </select>
+
+    <select id="getStickerName" resultMap="getStickerNameResultMap">
+        SELECT T1.* FROM tg_tag_sticker T1
+        <where>
+            <if test="map.userId !=null and !map.userId">
+                AND T1.CREATE_BY= #{map.userId}
+            </if>
+            <if test="map.stickerIds !=null">
+                <foreach collection='map.stickerIds' index='index' item='item' open='AND T1.ID in (' separator=',' close=')'>
+                    #{item.stickerId}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY T1.ID DESC
+    </select>
+
+    <select id="getSticker" resultType="com.kuangheng.cloud.tag.entity.TgTagStickerEntity">
+        SELECT T1.*
+        FROM tg_tag_sticker T1
+        left join tag_sticker_customer T2 on T2.sticker_id = T1.ID
+        <where>
+            <if test="userId !=null and !userId">
+                AND T2.USER_ID= #{userId}
+            </if>
+            <if test="customerId !=null and !customerId">
+                AND T2.CUSTOMER_ID= #{customerId}
+            </if>
+            AND T1.status = 1
+        </where>
+        ORDER BY T1.ID DESC
+    </select>
+
+</mapper>

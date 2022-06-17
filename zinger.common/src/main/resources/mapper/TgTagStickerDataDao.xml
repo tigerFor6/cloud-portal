@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.dao.TgTagStickerDataDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.entity.TgTagStickerDataEntity" id="tgTagStickerHisMap">
+        <result property="id" column="ID"/>
+        <result property="tagStickerId" column="TAG_STICKER_ID"/>
+        <result property="total" column="TOTAL"/>
+        <result property="baseTime" column="BASE_TIME"/>
+        <result property="calcTime" column="CALC_TIME"/>
+        <result property="calcStatus" column="CALC_STATUS"/>
+        <result property="showName" column="SHOW_NAME"/>
+        <result property="num" column="NUM"/>
+        <result property="percent" column="PERCENT"/>
+    </resultMap>
+
+    <sql id="tgTagStickerHisColumn">
+        ID,TAG_STICKER_ID,TOTAL,BASE_TIME,CALC_TIME,CALC_STATUS,SHOW_NAME,NUM,`PERCENT`
+    </sql>
+
+    <select id="getLatestOne" resultType="com.kuangheng.cloud.entity.TgTagStickerDataEntity">
+            SELECT
+                <include refid="tgTagStickerHisColumn"/>
+            FROM
+                TG_TAG_STICKER_DATA h
+            WHERE
+                h.TAG_STICKER_ID = #{tagId}
+            ORDER BY BASE_TIME DESC LIMIT 1
+    </select>
+
+    <select id="findStickerDataEntityList" resultType="com.kuangheng.cloud.entity.TgTagStickerDataEntity">
+        SELECT
+            <include refid="tgTagStickerHisColumn"/>
+        FROM
+            TG_TAG_STICKER_DATA h
+        WHERE
+            h.TAG_STICKER_ID = #{tagId}
+            <choose>
+                <when test="startDate !=null and startDate !='' and endDate!=null and endDate !=''">
+                    AND (h.BASE_TIME >= #{startDate} AND h.BASE_TIME &lt;= #{endDate})
+                </when>
+                <otherwise>
+                    AND DATE_SUB(CURDATE(), INTERVAL 10 DAY) &lt;= DATE(h.BASE_TIME)
+                </otherwise>
+            </choose>
+        ORDER BY h.BASE_TIME ASC
+    </select>
+
+    <select id="getByTagIdAndOneDate" resultType="com.kuangheng.cloud.entity.TgTagStickerDataEntity">
+        SELECT <include refid="tgTagStickerHisColumn"/> FROM TG_TAG_STICKER_DATA h
+        WHERE h.TAG_STICKER_ID = #{tagId} AND DATE_FORMAT(h.BASE_TIME,'%Y-%m-%d') = #{date} LIMIT 1
+    </select>
+
+</mapper>

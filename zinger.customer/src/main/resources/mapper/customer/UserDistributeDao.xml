@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuangheng.cloud.customer.dao.UserDistributeDao">
+  <resultMap id="BaseResultMap" type="com.kuangheng.cloud.customer.entity.UserDistributeEntity">
+    <id column="ID" property="id" />
+    <result column="USER_ID" javaType="java.lang.String" property="userId" />
+    <result column="STATUS" javaType="java.lang.String" property="status" />
+    <result column="TOTAL" javaType="java.lang.String" property="total" />
+    <result column="ACCEPT" javaType="java.lang.String" property="accept" />
+    <result column="REFUSE" javaType="java.lang.String" property="refuse" />
+    <result column="CREATE_BY" javaType="java.lang.String" property="createBy" />
+    <result column="CREATE_TIME" javaType="java.util.Date" property="createTime" />
+    <result column="UPDATE_BY"  javaType="java.lang.String" property="updateBy" />
+    <result column="UPDATE_TIME" javaType="java.util.Date" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, USER_ID, `STATUS`, TOTAL, ACCEPT, REFUSE, CREATE_BY, CREATE_TIME, UPDATE_BY, 
+    UPDATE_TIME
+  </sql>
+
+  <select id="findById" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user_distribute T1
+    <where>
+      <if test='id!=null and !id'>AND T1.ID = #{id}</if>
+    </where>
+    ORDER BY T1.ID DESC
+  </select>
+
+  <select id="find" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from user_distribute T1
+    <where>
+      <if test='map.id!=null and !map.id'>AND T1.ID = #{map.id}</if>
+      <if test='map.userId!=null and !map.userId'>AND (T1.USER_ID  = #{map.userId}
+        <if test="map.isHistory!=null and map.isHistory == 1">
+          OR T1.CREATE_BY  = #{map.userId}
+        </if>
+        )
+      </if>
+      <if test='map.status!=null and !map.status'>AND T1.STATUS  = #{map.status}</if>
+      <if test='map.createBy!=null and !map.createBy'>AND T1.CREATE_BY  = #{map.createBy}</if>
+      <if test='map.updateBy!=null and !map.updateBy'>AND T1.UPDATE_BY  = #{map.updateBy}</if>
+      <if test='map.isAction!=null and map.isAction == 1'>AND T1.STATUS > 0</if>
+    </where>
+    ORDER BY T1.ID DESC
+  </select>
+
+  <insert id="insertSelective" parameterType="com.kuangheng.cloud.customer.entity.UserDistributeEntity">
+    insert into user_distribute
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="map.id != null and !map.id">
+        ID,
+      </if>
+      <if test="map.userId != null and !map.userId">
+        USER_ID,
+      </if>
+      <if test="map.status != null and !map.status">
+        `STATUS`,
+      </if>
+      <if test="map.total != null and !map.total">
+        TOTAL,
+      </if>
+      <if test="map.accept != null and !map.accept">
+        ACCEPT,
+      </if>
+      <if test="map.refuse != null and !map.refuse">
+        REFUSE,
+      </if>
+      <if test="map.createBy != null and !map.createBy">
+        CREATE_BY,
+      </if>
+        CREATE_TIME,
+      <if test="map.updateBy != null and !map.updateBy">
+        UPDATE_BY,
+      </if>
+      <if test="map.updateTime != null and !map.updateTime">
+        UPDATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="map.id != null and !map.id">
+        #{map.id},
+      </if>
+      <if test="map.userId != null and !map.userId">
+        #{map.userId},
+      </if>
+      <if test="map.status != null and !map.status">
+        #{map.status},
+      </if>
+      <if test="map.total != null and !map.total">
+        #{map.total},
+      </if>
+      <if test="map.accept != null and !map.accept">
+        #{map.accept},
+      </if>
+      <if test="map.refuse != null and !map.refuse">
+        #{map.refuse},
+      </if>
+      <if test="map.createBy != null and !map.createBy">
+        #{map.createBy},
+      </if>
+        #{map.createTime},
+      <if test="map.updateBy != null and !map.updateBy">
+        #{map.updateBy},
+      </if>
+      <if test="map.updateTime != null and !map.updateTime">
+        #{map.updateTime},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="update">
+    update user_distribute
+    <set>
+      <if test="map.userId != null and !map.userId">
+        USER_ID  = #{map.userId},
+      </if>
+      <if test="map.status != null and !map.status">
+        `STATUS`  = #{map.status},
+      </if>
+      <if test="map.total != null and !map.total">
+        TOTAL  = #{map.total},
+      </if>
+      <if test="map.accept != null and !map.accept">
+        ACCEPT  = #{map.accept},
+      </if>
+      <if test="map.refuse != null and !map.refuse">
+        REFUSE  = #{map.refuse},
+      </if>
+      <if test="map.createBy != null and !map.createBy">
+        CREATE_BY  = #{map.createBy},
+      </if>
+      <if test="map.createTime != null and !map.createTime">
+        CREATE_TIME  = #{map.createTime},
+      </if>
+      <if test="map.updateBy != null and !map.updateBy">
+        UPDATE_BY  = #{map.updateBy},
+      </if>
+      <if test="map.updateTime != null and !map.updateTime">
+        UPDATE_TIME  = #{map.updateTime},
+      </if>
+    </set>
+    where ID  = #{map.id}
+  </update>
+
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.tag.dao.TgCustomerGroupDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.tag.entity.TgCustomerGroupEntity" id="tgCustomerGroupMap">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="accessPermission" column="ACCESS_PERMISSION"/>
+        <result property="ruleContent" column="RULE_CONTENT"/>
+        <result property="excludeRuleContent" column="EXCLUDE_RULE_CONTENT"/>
+        <result property="sort" column="SORT"/>
+        <result property="status" column="STATUS"/>
+        <result property="creationMethod" column="CREATION_METHOD"/>
+        <result property="num" column="NUM"/>
+        <result property="showStatus" column="SHOW_STATUS"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="refField" column="REF_FIELD"/>
+        <result property="sqlContent" column="SQL_CONTENT"/>
+        <result property="isRoutine" column="IS_ROUTINE"/>
+        <result property="fileKey" column="FILE_KEY"/>
+    </resultMap>
+
+    <sql id="tgCustomerGroupColumn">
+        ID,NAME,ACCESS_PERMISSION,RULE_CONTENT,
+        EXCLUDE_RULE_CONTENT,SORT,STATUS,CREATION_METHOD,NUM,SHOW_STATUS,CREATE_BY,
+        CREATE_TIME,UPDATE_BY,UPDATE_TIME,REMARK,REF_FIELD,SQL_CONTENT,IS_ROUTINE,FILE_KEY
+    </sql>
+
+</mapper>

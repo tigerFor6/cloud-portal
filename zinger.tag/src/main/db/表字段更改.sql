@@ -1,0 +1,7 @@
+ALTER TABLE `tg_tag_dimension_data`
+    CHANGE COLUMN `HIS_TAG_ID` `DATA_TAG_ID`  bigint(20) NULL DEFAULT NULL COMMENT '历史数据标签ID' AFTER `ID`;
+
+ALTER TABLE `tg_tag_layer_data`
+    CHANGE COLUMN `HIS_DIMENSION_ID` `DATA_DIMENSION_ID`  bigint(20) NULL DEFAULT NULL COMMENT '维度id' AFTER `LAYER_ID`;
+
+-------已更新------

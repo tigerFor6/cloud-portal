@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.metadata.dao.MetPropertyValueDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.metadata.entity.MetPropertyValueEntity" id="metPropertyValueMap">
+        <result property="id" column="ID"/>
+        <result property="propertyId" column="PROPERTY_ID"/>
+        <result property="name" column="NAME"/>
+        <result property="value" column="VALUE"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="fieldName" column="FIELD_NAME"/>
+    </resultMap>
+
+    <sql id="metPropertyValueColumn">
+        ID,PROPERTY_ID,`NAME`,`VALUE`,CREATE_BY,CREATE_TIME,UPDATE_BY,UPDATE_TIME,REMARK
+    </sql>
+
+    <select id="getListByPropertyId" resultType="java.lang.String">
+        SELECT `NAME` FROM MET_PROPERTY_VALUE
+        WHERE PROPERTY_ID = #{propertyId}
+    </select>
+
+    <select id="findByPropertyId" resultType="com.kuangheng.cloud.metadata.entity.MetPropertyValueEntity">
+        SELECT <include refid="metPropertyValueColumn"/> FROM MET_PROPERTY_VALUE
+        WHERE PROPERTY_ID = #{propertyId}
+    </select>
+
+    <select id="findFieldByPropertyId" resultType="com.kuangheng.cloud.metadata.entity.MetPropertyValueEntity">
+        SELECT T1.ID,T1.PROPERTY_ID,T1.NAME,T1.VALUE,T1.REMARK,T2.NAME FIELD_NAME
+            FROM MET_PROPERTY_VALUE T1
+            left join MET_PROPERTY T2 on T2.ID = T1.PROPERTY_ID
+        WHERE T1.PROPERTY_ID = #{propertyId}
+        AND T1.NAME = #{value}
+    </select>
+
+
+</mapper>

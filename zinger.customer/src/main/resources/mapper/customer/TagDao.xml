@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuangheng.cloud.customer.dao.TagDao">
+
+  <resultMap id="getTagByIdsMap" type="java.util.Map">
+    <id column="ID" javaType="java.lang.String" property="id" />
+    <result column="PID" javaType="java.lang.String" property="pId" />
+    <result column="NAME" javaType="java.lang.String" property="name" />
+    <result column="CNAME" javaType="java.lang.String" property="cname" />
+    <result column="CNAME_COLOR" javaType="java.lang.String" property="cnameColor" />
+    <result column="SOURCE_TYPE" javaType="java.lang.String" property="sourceType" />
+    <result column="DATA_TYPE" javaType="java.lang.String" property="dataType" />
+    <result column="UNIT" javaType="java.lang.String" property="unit" />
+  </resultMap>
+  <select id="getTagByIds" resultMap="getTagByIdsMap">
+    select T1.ID, T1.PID, T1.NAME, T1.CNAME, T1.CNAME_COLOR, T1.SOURCE_TYPE, T1.DATA_TYPE, T1.UNIT
+    from tg_tag T1
+    <where>
+      <foreach collection='tagList' item='tag' open='AND T1.ID in (' separator=',' close=')'> #{tag.tagId}</foreach>
+      and T1.STATUS = 1
+    </where>
+  </select>
+
+</mapper>

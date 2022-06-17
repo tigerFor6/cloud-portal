@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/data/logs/zinger-tag.log</file>
+        <encoder>
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger - %msg%n
+            </Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>./logs/archived/zinger-tag.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+    <!--<appender name="ELASTIC" class="com.internetitem.logback.elasticsearch.ElasticsearchAppender">
+        <url>http://localhost:9200</url>
+        <userName></userName>
+        <password></password>
+        <index>logs-%d{yyyy-MM-dd}</index>
+        <type>zinger-tag</type>
+        <loggerName>es-logger</loggerName>
+        <errorLoggerName>es-error-logger</errorLoggerName>
+        <connectTimeout>30000</connectTimeout>
+        <errorsToStderr>false</errorsToStderr>
+        <includeCallerData>false</includeCallerData>
+        <logsToStderr>false</logsToStderr>
+        <maxQueueSize>104857600</maxQueueSize>
+        <maxRetries>3</maxRetries>
+        <readTimeout>30000</readTimeout>
+        <sleepTime>250</sleepTime>
+        <rawJsonMessage>false</rawJsonMessage>
+        <includeMdc>true</includeMdc>
+        <maxMessageSize>-1</maxMessageSize>
+        <properties>
+            <property>
+                <name>host</name>
+                <value>${HOSTNAME}</value>
+                <allowEmpty>false</allowEmpty>
+            </property>
+            <property>
+                <name>severity</name>
+                <value>%level</value>
+            </property>
+            <property>
+                <name>thread</name>
+                <value>%thread</value>
+            </property>
+            <property>
+                <name>stacktrace</name>
+                <value>%ex</value>
+            </property>
+            <property>
+                <name>logger</name>
+                <value>%logger</value>
+            </property>
+        </properties>
+        <headers>
+            <header>
+                <name>Content-Type</name>
+                <value>application/json</value>
+            </header>
+        </headers>
+    </appender>-->
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %red(%date{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %red([%thread]) %boldMagenta(%logger{50}) %cyan(%msg%n)
+            </Pattern>
+        </layout>
+    </appender>
+
+    <logger name="com.kuangheng" level="debug" additivity="false">
+        <appender-ref ref="FILE" />
+<!--        <appender-ref ref="ELASTIC" />-->
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="FILE" />
+<!--        <appender-ref ref="ELASTIC" />-->
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

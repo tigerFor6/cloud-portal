@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuangheng.cloud.dao.ResDao">
+    <insert id="addRoles">
+        insert into SYS_RES_ROLE(ID, RES_ID, ROLE_ID, CREATE_BY, CREATE_TIME) values
+        <foreach collection ="resRoles" item="resRole" separator =",">
+            (#{resRole.id}, #{resRole.resId}, #{resRole.roleId}, #{resRole.createBy}, #{resRole.createTime})
+        </foreach >
+    </insert>
+
+    <delete id="deleteBatch">
+        delete from SYS_RES_ROLE where ROLE_ID = #{roleId} and RES_ID in
+        <foreach collection="resList" item="res" open="(" close=")" separator=",">
+            #{res.id}
+        </foreach>
+
+    </delete>
+</mapper>

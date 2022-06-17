@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.tag.dao.TgTagLayerDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.tag.entity.TgTagLayerEntity" id="tgTagLayerMap">
+        <result property="id" column="ID"/>
+        <result property="dimensionId" column="DIMENSION_ID"/>
+        <result property="field" column="FIELD"/>
+        <result property="function" column="`FUNCTION`"/>
+        <result property="params" column="PARAMS"/>
+        <result property="sort" column="SORT"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="showName" column="SHOW_NAME"/>
+        <result property="webWidget" column="WEB_WIDGET"/>
+    </resultMap>
+
+    <sql id="tgTagLayerColumn">
+        ID,DIMENSION_ID,FIELD,`FUNCTION`,PARAMS,SORT,CREATE_TIME,UPDATE_TIME,REMARK,SHOW_NAME,WEB_WIDGET
+    </sql>
+
+    <select id="getByDimId" resultType="com.kuangheng.cloud.tag.dto.TgTagLayerDTO">
+        SELECT <include refid="tgTagLayerColumn"/> FROM TG_TAG_LAYER
+        WHERE DIMENSION_ID = #{dimId}
+    </select>
+
+    <select id="getByTagIdAndDimId" resultType="com.kuangheng.cloud.tag.entity.TgTagLayerEntity">
+        SELECT
+            l.*
+        FROM
+            TG_TAG tag
+        JOIN TG_TAG_DIMENSION d ON tag.ID = d.TAG_ID
+        JOIN TG_TAG_LAYER l ON l.DIMENSION_ID = d.ID
+        WHERE
+            tag.ID = #{tagId}
+        AND d.ID = #{dimId}
+    </select>
+
+    <select id="queryLayerIdList" resultType="java.lang.String">
+        SELECT ID FROM TG_TAG_LAYER WHERE DIMENSION_ID = #{dimId}
+    </select>
+
+</mapper>

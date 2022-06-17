@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuangheng.cloud.customer.dao.UserCustomerDao">
+  <resultMap id="BaseResultMap" type="com.kuangheng.cloud.customer.dto.UserCustomerDTO">
+    <id column="ID" javaType="java.lang.String" property="id" />
+    <result column="USER_ID" javaType="java.lang.String" property="userId" />
+    <result column="CUSTOMER_ID" javaType="java.lang.String" property="customerId" />
+    <result column="STATUS" javaType="java.lang.String" property="status" />
+    <result column="STATUS_DESC" javaType="java.lang.String" property="statusDesc" />
+    <result column="CREATE_BY" javaType="java.lang.String" property="createBy" />
+    <result column="CREATE_TIME" javaType="java.util.Date" property="createTime" />
+    <result column="UPDATE_BY" javaType="java.lang.String" property="updateBy" />
+    <result column="UPDATE_TIME" javaType="java.util.Date" property="updateTime" />
+    <result column="USER_ID_DESC" javaType="java.lang.String" property="userIdDesc" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    ID, USER_ID, CUSTOMER_ID,DISTRIBUTE_ID,`STATUS`, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME
+  </sql>
+  <select id="find" resultMap="BaseResultMap">
+    select
+    CASE WHEN (T1.STATUS=-1) THEN '拒绝接收' WHEN (T1.STATUS=0) THEN '待处理' WHEN (T1.STATUS=1) THEN '跟进中' WHEN (T1.STATUS=2) THEN '已转交' ELSE '' END AS status_desc,
+    <include refid="Base_Column_List" />
+    from user_customer T1
+    <where>
+      <if test='map.id!=null and !map.id'>AND T1.ID= #{map.id}</if>
+      <if test='map.userId!=null and !map.userId'>AND T1.USER_ID= #{map.userId}</if>
+      <if test='map.customerId!=null and !map.customerId'>AND T1.CUSTOMER_ID= #{map.customerId}</if>
+      <if test='map.status!=null and !map.status'>AND T1.STATUS = #{map.status}</if>
+      <if test='map.createBy!=null and !map.createBy'>AND T1.CREATE_BY= #{map.createBy}</if>
+      <if test='map.createTime!=null and !map.createTime'>AND T1.CREATE_TIME= #{map.createTime}</if>
+      <if test='map.updateBy!=null and !map.updateBy'>AND T1.UPDATE_BY= #{map.updateBy}</if>
+      <if test='map.updateTime!=null and !map.updateTime'>AND T1.UPDATE_TIME= #{map.updateTime}</if>
+      <if test='map.isFind!=null and !map.isFind'>AND T1.STATUS IN (0, 1)</if>
+    </where>
+  </select>
+
+  <resultMap id="countByDistributeIdResultMap" type="java.util.HashMap">
+    <result column="TOTAL" javaType="java.lang.Integer" property="total" />
+  </resultMap>
+  <select id="countByDistributeId" resultMap="countByDistributeIdResultMap">
+    select count(id) total
+    from user_customer
+    <where>
+      <if test='map.distributeId!=null and !map.distributeId'>AND distribute_id = #{map.distributeId}</if>
+      <if test='map.status!=null and !map.status'>AND status = #{map.status}</if>
+    </where>
+  </select>
+
+
+  <select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from user_customer
+    where ID = #{id}
+  </select>
+
+  <select id="selectByCustomerId" parameterType="java.lang.String" resultType="com.kuangheng.cloud.customer.entity.UserCustomerEntity">
+    select
+    <include refid="Base_Column_List" />
+    from user_customer
+    where CUSTOMER_ID = #{customerId}
+  </select>
+
+  <select id="queryUserDetail" resultMap="BaseResultMap">
+    select T1.ID, T1.USER_ID, T1.CUSTOMER_ID, T1.CREATE_BY, T1.CREATE_TIME, T1.UPDATE_BY, T1.UPDATE_TIME,
+            T2.FULLNAME USER_ID_DESC
+    from user_customer T1
+    left join sys_user T2 on T2.ID = T1.USER_ID
+    <where>
+      <if test='map.customerIds!=null and !map.customerIds'>AND T1.CUSTOMER_ID in ( #{map.customerIds} as string) )</if>
+    </where>
+  </select>
+
+  <select id="getUserByCustomers" resultMap="BaseResultMap">
+    select T1.ID, T1.USER_ID, T1.CUSTOMER_ID, T1.STATUS, T1.DISTRIBUTE_ID, T1.CREATE_BY, T1.CREATE_TIME, T1.UPDATE_BY, T1.UPDATE_TIME,
+    CASE WHEN (T1.STATUS=-1) THEN '拒绝接收' WHEN (T1.STATUS=0) THEN '待处理' WHEN (T1.STATUS=1) THEN '跟进中' WHEN (T1.STATUS=2) THEN '已转交' ELSE '' END AS status_desc
+    from user_customer T1
+    <where>
+      <foreach collection='customerIdList' item='customerId' open='AND T1.CUSTOMER_ID in (' separator=',' close=')'>
+        #{customerId}
+      </foreach>
+      and T1.STATUS not in (-1, 2)
+    </where>
+  </select>
+
+  <insert id="insert" parameterType="com.kuangheng.cloud.customer.entity.UserCustomerEntity" >
+    insert into user_customer (
+        ID, USER_ID, CUSTOMER_ID, `STATUS`, DISTRIBUTE_ID,
+        CREATE_BY, CREATE_TIME
+    )
+    values (
+      #{map.id},
+      #{map.userId},
+      #{map.customerId},
+      #{map.status},
+      #{map.distributeId},
+      #{map.createBy},
+      #{map.createTime}
+    )
+  </insert>
+
+  <insert id="insertSelective">
+    insert into user_customer
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      ID,
+      USER_ID,
+      CUSTOMER_ID,
+      <if test="map.status != null and !map.status">
+        `STATUS`,
+      </if>
+      <if test="map.distributeId != null and !map.distributeId">
+        DISTRIBUTE_ID,
+      </if>
+      <if test="map.createBy != null and !map.createBy">
+        CREATE_BY,
+      </if>
+      <if test="map.createTime != null and !map.createTime">
+        CREATE_TIME,
+      </if>
+      <if test="map.updateBy != null and !map.updateBy">
+        UPDATE_BY,
+      </if>
+      <if test="map.updateTime != null and !map.updateTime">
+        UPDATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      #{map.id},
+      #{map.userId},
+      #{map.customerId},
+      <if test="map.status != null and !map.status">
+        #{map.status},
+      </if>
+      <if test="map.distributeId != null and !map.distributeId">
+        #{map.distributeId},
+      </if>
+      <if test="map.createBy != null and !map.createBy">
+        #{map.createBy},
+      </if>
+      <if test="map.createTime != null and !map.createTime">
+        #{map.createTime},
+      </if>
+      <if test="map.updateBy != null and !map.updateBy">
+        #{map.updateBy},
+      </if>
+      <if test="map.updateTime != null and !map.updateTime">
+        #{map.updateTime},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByIdSelective">
+    update user_customer
+    <set>
+      <if test="map.userId != null and !map.userId">
+        USER_ID = #{map.userId},
+      </if>
+      <if test="map.customerId != null and !map.customerId">
+        CUSTOMER_ID = #{map.customerId},
+      </if>
+      <if test="map.status != null and !map.status">
+        `STATUS` = #{map.status},
+      </if>
+      <if test="map.createBy != null and !map.createBy">
+        CREATE_BY = #{map.createBy},
+      </if>
+      <if test="map.createTime != null and !map.createTime">
+        CREATE_TIME = #{map.createTime},
+      </if>
+      <if test="map.updateBy != null and !map.updateBy">
+        UPDATE_BY = #{map.updateBy},
+      </if>
+      <if test="map.updateTime != null and !map.updateTime">
+        UPDATE_TIME = #{map.updateTime},
+      </if>
+    </set>
+    where ID = #{map.id}
+  </update>
+
+  <delete id="deleteById" parameterType="java.lang.String">
+    delete from user_customer
+    where ID = #{id}
+  </delete>
+
+  <update id="updateStatus">
+    update user_customer
+    <set>
+        `STATUS` = #{map.status},
+      <if test="map.updateBy != null and !map.updateBy">
+        UPDATE_BY = #{map.updateBy},
+      </if>
+        UPDATE_TIME = #{map.updateTime},
+    </set>
+    <where>
+      and USER_ID = #{map.userId}
+      and CUSTOMER_ID = #{map.customerId}
+    </where>
+  </update>
+
+  <update id="batchUpdateStatus">
+    update user_customer
+    <set>
+      `STATUS` = #{map.status},
+      <if test="map.updateBy != null and !map.updateBy">
+        UPDATE_BY = #{map.updateBy},
+      </if>
+      UPDATE_TIME = #{map.updateTime},
+    </set>
+    <where>
+      <foreach item="customerId" index="index" collection="map.customerIds" open="and customer_id in (" separator="," close=")">
+        #{customerId}
+      </foreach>
+      and status in (0, 1)
+    </where>
+  </update>
+
+  <update id="updateByDistributeId">
+    update user_customer
+    <set>
+      <if test="map.status != null and !map.status">
+        STATUS = #{map.status},
+      </if>
+      <if test="map.updateBy != null and !map.updateBy">
+        UPDATE_BY = #{map.updateBy},
+      </if>
+        UPDATE_TIME = #{map.updateTime},
+    </set>
+    <where>
+      and DISTRIBUTE_ID = #{map.distributeId}
+      <if test='map.acceptIds!=null'>
+        <foreach collection='map.acceptIds' item='customerId' open='AND CUSTOMER_ID in (' separator=',' close=')'>
+          #{customerId}
+        </foreach>
+      </if>
+    </where>
+  </update>
+
+  <update id="updateOtherByDistributeId">
+    update user_customer
+    <set>
+      <if test="map.status != null and !map.status">
+        STATUS = #{map.status},
+      </if>
+      <if test="map.updateBy != null and !map.updateBy">
+        UPDATE_BY = #{map.updateBy},
+      </if>
+      <if test="map.updateTime != null and !map.updateTime">
+        UPDATE_TIME = #{map.updateTime},
+      </if>
+    </set>
+    <where>
+      and DISTRIBUTE_ID = #{map.distributeId}
+      and STATUS = 0
+    </where>
+  </update>
+
+  <select id="selectDtoByCustomerId" resultType="com.kuangheng.cloud.customer.dto.UserCustomerDTO">
+    select
+        t1.ID, t1.USER_ID, t1.CUSTOMER_ID, t1.DISTRIBUTE_ID, t1.STATUS, t1.CREATE_BY, t1.CREATE_TIME, t1.UPDATE_BY, t1.UPDATE_TIME,
+        t2.name user_id_desc
+    from user_customer t1
+    left join sys_user t2 on t2.id = t1.user_id
+    where t1.CUSTOMER_ID = #{customerId}
+  </select>
+</mapper>

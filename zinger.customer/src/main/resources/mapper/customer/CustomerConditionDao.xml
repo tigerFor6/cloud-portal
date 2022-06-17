@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.customer.dao.CustomerConditionDao">
+
+    <select id="findAll" resultType="com.kuangheng.cloud.customer.entity.CustomerConditionEntity">
+        SELECT
+            T1.*
+        FROM ${impala-sechema}.customer_condition T1
+        <where>
+            <if test="map.id !=null and !map.id">
+                AND T1.ID= cast(#{map.id} as bigint)
+            </if>
+            <if test="map.userId !=null and !map.userId">
+                AND T1.USER_ID= cast(#{map.userId} as bigint)
+            </if>
+            <if test="map.name !=null and !map.name">
+                AND T1.NAME= cast(#{map.name} as string)
+            </if>
+            <if test="map.conditionDesc !=null and !map.conditionDesc">
+                AND T1.CONDITION_DESC= cast(#{map.conditionDesc} as string)
+            </if>
+        </where>
+        ORDER BY T1.CREATE_TIME DESC
+    </select>
+
+    <insert id="create">
+        INSERT INTO ${impala-sechema}.customer_condition
+        (
+            ID,
+            NAME,
+            <if test="map.userId !=null and !map.userId">
+                USER_ID,
+            </if>
+            <if test="map.conditionDesc !=null and !map.conditionDesc">
+                CONDITION_DESC,
+            </if>
+            <if test="map.createForm !=null and !map.createForm">
+                CREATE_FORM,
+            </if>
+            <if test="map.createBy !=null and !map.createBy">
+                CREATE_BY,
+            </if>
+            CREATE_TIME
+        ) values (
+            cast(#{map.id} as bigint),
+            cast(#{map.name} as string),
+            <if test="map.userId !=null">
+                cast(#{map.userId} as bigint),
+            </if>
+            <if test="map.conditionDesc !=null and !map.conditionDesc">
+                cast(#{map.conditionDesc} as string),
+            </if>
+            <if test="map.createForm !=null and !map.createForm">
+                cast(#{map.createForm} as string),
+            </if>
+            <if test="map.createBy !=null and !map.createBy">
+                cast(#{map.createBy} as bigint),
+            </if>
+            cast(#{map.createTime} as timestamp)
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE ${impala-sechema}.customer_condition
+        <set>
+            <if test="map.userId !=null and map.userId">
+                USER_ID= cast(#{map.userId} as bigint),
+            </if>
+            <if test="map.name !=null and map.name">
+                NAME= cast(#{map.name} as string),
+            </if>
+            <if test="map.conditionDesc !=null and map.conditionDesc">
+                CONDITION_DESC= cast(#{map.conditionDesc} as string),
+            </if>
+            <if test="map.updateBy !=null and map.updateBy">
+                UPDATE_BY=cast(#{map.updateBy} as bigint),
+            </if>
+            <if test="map.updateTime !=null and map.updateTime">
+                UPDATE_TIME= cast(#{map.updateTime} as timestamp),
+            </if>
+        </set>
+        where ID=cast(#{map.id} as bigint)
+    </update>
+
+    <delete id="delete">
+        delete from ${impala-sechema}.customer_condition where ID=cast(#{map.id} as bigint)
+    </delete>
+
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.tag.dao.TgCustomerGroupRecDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.tag.entity.TgCustomerGroupRecEntity" id="tgCustomerGroupRecMap">
+        <result property="id" column="ID"/>
+        <result property="customerGroupId" column="CUSTOMER_GROUP_ID"/>
+        <result property="name" column="NAME"/>
+        <result property="accessPermission" column="ACCESS_PERMISSION"/>
+        <result property="creationMethod" column="CREATION_METHOD"/>
+        <result property="refField" column="REF_FIELD"/>
+        <result property="ruleContent" column="RULE_CONTENT"/>
+        <result property="excludeRuleContent" column="EXCLUDE_RULE_CONTENT"/>
+        <result property="sqlContent" column="SQL_CONTENT"/>
+        <result property="sort" column="SORT"/>
+        <result property="status" column="STATUS"/>
+        <result property="num" column="NUM"/>
+        <result property="showStatus" column="SHOW_STATUS"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="isRoutine" column="IS_ROUTINE"/>
+        <result property="version" column="VERSION"/>
+        <result property="recType" column="REC_TYPE"/>
+    </resultMap>
+
+    <sql id="tgCustomerGroupRecColumn">
+        ID,CUSTOMER_GROUP_ID,NAME,ACCESS_PERMISSION,CREATION_METHOD,REF_FIELD,
+        RULE_CONTENT,EXCLUDE_RULE_CONTENT,SQL_CONTENT,SORT,STATUS,NUM,SHOW_STATUS,
+        CREATE_BY,CREATE_TIME,UPDATE_BY,UPDATE_TIME,REMARK,IS_ROUTINE,VERSION,REC_TYPE
+    </sql>
+
+    <insert id="save">
+        INSERT INTO TG_CUSTOMER_GROUP_REC(
+            ID,CUSTOMER_GROUP_ID,NAME,ACCESS_PERMISSION,CREATION_METHOD,REF_FIELD,
+            RULE_CONTENT,EXCLUDE_RULE_CONTENT,SQL_CONTENT,SORT,STATUS,NUM,SHOW_STATUS,
+            CREATE_BY,CREATE_TIME,UPDATE_BY,UPDATE_TIME,REMARK,IS_ROUTINE,VERSION,REC_TYPE
+        ) SELECT ${snowId},ID,NAME,ACCESS_PERMISSION,CREATION_METHOD,REF_FIELD,
+                 RULE_CONTENT,EXCLUDE_RULE_CONTENT,SQL_CONTENT,SORT,STATUS,NUM,SHOW_STATUS,
+                 CREATE_BY,CREATE_TIME,UPDATE_BY,UPDATE_TIME,REMARK,IS_ROUTINE,${version},'${type}'
+        FROM TG_CUSTOMER_GROUP WHERE ID = ${customerGroupId}
+    </insert>
+
+    <select id="getVersion" resultType="java.lang.Integer">
+        SELECT  t.VERSION FROM TG_CUSTOMER_GROUP_REC t
+            WHERE t.CUSTOMER_GROUP_ID = #{customerGroupId}
+        ORDER BY t.VERSION DESC LIMIT 1
+    </select>
+
+</mapper>

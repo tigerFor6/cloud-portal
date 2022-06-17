@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.activity.dao.ActivityTriggerDao">
+
+    <resultMap type="com.kuangheng.cloud.activity.entity.ActivityTriggerEntity" id="activityTriggerMap">
+        <result property="activityId" column="activity_id"/>
+        <result property="cronExpress" column="cron_express"/>
+        <result property="triggerType" column="trigger_type"/>
+        <result property="touchTime" column="touch_time"/>
+        <result property="conditionRule" column="condition_rule"/>
+        <result property="officialAccount" column="official_account"/>
+        <result property="templateId" column="template_id"/>
+        <result property="content" column="content"/>
+    </resultMap>
+
+    <select id="findActivityTriggerByActivityId" parameterType="java.lang.String" resultMap="activityTriggerMap">
+        SELECT
+            activity_id,cron_express,trigger_type,touch_time,condition_rule,official_account,template_id,content
+        FROM activity_trigger
+        WHERE
+            activity_id = #{activityId}
+    </select>
+</mapper>

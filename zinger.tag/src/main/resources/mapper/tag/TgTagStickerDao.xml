@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.tag.dao.TgTagStickerDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.tag.entity.TgTagStickerEntity" id="tgTagStickerMap">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="cname" column="CNAME"/>
+        <result property="tagGroupId" column="TAG_GROUP_ID"/>
+        <result property="status" column="STATUS"/>
+        <result property="accessPermission" column="ACCESS_PERMISSION"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="sort" column="SORT"/>
+        <result property="cnameColor" column="CNAME_COLOR"/>
+    </resultMap>
+
+    <sql id="tgTagStickerColumn">
+        ID,NAME,CNAME,TAG_GROUP_ID,STATUS,ACCESS_PERMISSION,CREATE_BY,CREATE_TIME,UPDATE_BY,UPDATE_TIME,REMARK,SORT,CNAME_COLOR
+    </sql>
+
+    <update id="updateSort">
+        UPDATE TG_TAG_STICKER SET SORT=#{sort} WHERE ID=#{id}
+    </update>
+
+    <select id="findTagList" resultType="com.kuangheng.cloud.tag.entity.TgTagStickerEntity">
+        SELECT <include refid="tgTagStickerColumn"/> FROM TG_TAG_STICKER WHERE 1=1
+        <if test="userId !=null and userId !=''">
+            AND CREATE_BY = #{userId}
+        </if>
+    </select>
+
+    <select id="findTagByDataTagIdList" resultType="com.kuangheng.cloud.tag.entity.TgTagStickerEntity">
+        SELECT <include refid="tgTagStickerColumn"/> FROM (
+            SELECT DISTINCT
+                t.*
+            FROM
+                TG_TAG_STICKER t
+                    JOIN TG_TAG_STICKER_DATA th ON t.ID = th.TAG_STICKER_ID
+            WHERE t.CREATE_BY = #{userId}
+                 AND t.ID IN
+                    <foreach collection="hisTagIdList" open="(" close=")" item="hisTagId" separator=",">#{hisTagId}</foreach>
+        ) t1 LIMIT 10
+    </select>
+
+</mapper>

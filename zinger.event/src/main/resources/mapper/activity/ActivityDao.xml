@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.activity.dao.ActivityDao">
+
+    <resultMap type="com.kuangheng.cloud.activity.entity.ActivityEntity" id="activityMap">
+        <result property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="name" column="name"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="target" column="target"/>
+        <result property="description" column="description"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap type="com.kuangheng.cloud.activity.dto.ActivityVo" id="eventMap">
+        <result property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="subtype" column="subtype"/>
+        <result property="name" column="name"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="target" column="target"/>
+        <result property="description" column="description"/>
+        <result property="handler" column="handler"/>
+        <result property="handlerNames" column="handler_names"/>
+        <result property="status" column="status"/>
+        <association property="activityTrigger" javaType="com.kuangheng.cloud.activity.entity.ActivityTriggerEntity">
+            <id property="activityId" column="id"/>
+            <result property="id" column="trigger_id"/>
+            <result property="cronExpress" column="cron_express"/>
+            <result property="triggerType" column="trigger_type"/>
+            <result property="touchTime" column="touch_time"/>
+            <result property="conditionRule" column="condition_rule"/>
+            <result property="officialAccount" column="official_account"/>
+            <result property="templateId" column="template_id"/>
+            <result property="content" column="content"/>
+        </association>
+    </resultMap>
+
+    <sql id="activityColumn">
+        id,type,name,start_time,end_time,target,description,handler,handler_names,status,create_by,create_time,update_by,update_time
+    </sql>
+
+    <select id="findActivityById" resultType="com.kuangheng.cloud.activity.entity.ActivityEntity">
+        SELECT <include refid="activityColumn"/>
+        FROM activity_info WHERE id = #{id}
+    </select>
+
+    <select id="getStopActivityIds" resultType="java.lang.String">
+        SELECT id FROM activity_info WHERE status = 2 and stop_time is not null
+    </select>
+
+    <delete id="delete" parameterType="java.lang.String">
+        delete from activity_info where id = #{id}
+    </delete>
+
+
+    <select id="findActivityList" parameterType="com.kuangheng.cloud.activity.dto.ActivityDTO" resultType="com.kuangheng.cloud.activity.entity.ActivityEntity">
+        SELECT
+        <include refid="activityColumn"/>
+        FROM activity_info
+        <where>
+            <if test="id !=null and id !=''">
+                AND id = #{id}
+            </if>
+            <if test="name !=null and name !=''">
+                AND name = #{name}
+            </if>
+            <if test="type !=null and type !=''">
+                AND type = #{type}
+            </if>
+            <if test="status !=null and status !=''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="findActivityVo" resultMap="eventMap" parameterType="java.lang.String">
+        SELECT
+            a.id,a.type,a.subtype,a.name,a.start_time,a.end_time,a.target,a.handler,a.handler_names,a.description,a.status,a.create_by,a.create_time,a.update_by,a.update_time,
+            t.id as trigger_id,t.cron_express,t.trigger_type,t.touch_time,t.condition_rule,t.official_account,t.template_id,t.content
+        FROM activity_info a left join activity_trigger t on a.id=t.activity_id
+        WHERE a.id = #{activityId}
+    </select>
+
+    <select id="findCountByStatus" resultType="map">
+        SELECT status,count(1) num
+        FROM activity_info where create_by = #{createBy} group by status
+    </select>
+
+    <update id="updateStopTime" parameterType="java.lang.String">
+        UPDATE activity_info set stop_time = null where id = #{id}
+    </update>
+</mapper>

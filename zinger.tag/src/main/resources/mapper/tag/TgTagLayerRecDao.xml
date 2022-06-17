@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.tag.dao.TgTagLayerRecDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.tag.entity.TgTagLayerRecEntity" id="tgTagLayerRecMap">
+        <result property="id" column="ID"/>
+        <result property="layerId" column="LAYER_ID"/>
+        <result property="dimensionId" column="DIMENSION_ID"/>
+        <result property="field" column="FIELD"/>
+        <result property="function" column="`FUNCTION`"/>
+        <result property="params" column="PARAMS"/>
+        <result property="sort" column="SORT"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="dimensionRecId" column="DIMENSION_REC_ID"/>
+        <result property="webWidget" column="WEB_WIDGET"/>
+        <result property="showName" column="SHOW_NAME"/>
+    </resultMap>
+
+    <sql id="tgTagLayerRecColumn">
+        ID,LAYER_ID,DIMENSION_ID,FIELD,`FUNCTION`,PARAMS,SORT,CREATE_TIME,UPDATE_TIME,REMARK,DIMENSION_REC_ID,WEB_WIDGET,SHOW_NAME
+    </sql>
+    <insert id="saveLog">
+        INSERT INTO tg_tag_layer_rec(
+            ID,LAYER_ID,DIMENSION_ID,FIELD,`FUNCTION`,PARAMS,SORT,CREATE_TIME,UPDATE_TIME,REMARK,SHOW_NAME,WEB_WIDGET,DIMENSION_REC_ID
+        ) SELECT ${layerRecSnowId},ID,DIMENSION_ID,FIELD,`FUNCTION`,PARAMS,SORT,CREATE_TIME,UPDATE_TIME,REMARK,SHOW_NAME,WEB_WIDGET,${dimRecSnowId}
+        FROM tg_tag_layer WHERE ID = ${layerId}
+    </insert>
+    <select id="getMaxVersionByTagId" resultType="java.lang.Integer">
+        SELECT VERSION FROM tg_tag_layer_rec WHERE LAYER_ID = #{layerId} ORDER BY VERSION DESC LIMIT 1  FOR UPDATE
+    </select>
+
+</mapper>

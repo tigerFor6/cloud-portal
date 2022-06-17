@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.tag.dao.TgTagLayerDataDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.tag.entity.TgTagLayerDataEntity" id="tgTagLayerHisMap">
+        <result property="id" column="ID"/>
+        <result property="layerId" column="LAYER_ID"/>
+        <result property="dataDimensionId" column="DATA_DIMENSION_ID"/>
+        <result property="field" column="FIELD"/>
+        <result property="function" column="`FUNCTION`"/>
+        <result property="params" column="PARAMS"/>
+        <result property="sort" column="SORT"/>
+        <result property="showName" column="SHOW_NAME"/>
+        <result property="num" column="NUM"/>
+        <result property="percent" column="PERCENT"/>
+        <result property="webWidget" column="WEB_WIDGET"/>
+    </resultMap>
+
+    <sql id="tgTagLayerHisColumn">
+        ID,LAYER_ID,FIELD,`FUNCTION`,PARAMS,SORT,SHOW_NAME,NUM,`PERCENT`,DATA_DIMENSION_ID,WEB_WIDGET
+    </sql>
+
+    <select id="listByDataDimId" resultType="com.kuangheng.cloud.tag.entity.TgTagLayerDataEntity">
+        select <include refid="tgTagLayerHisColumn"/> from TG_TAG_LAYER_DATA
+        where DATA_DIMENSION_ID= #{hisDimId}
+    </select>
+
+    <select id="getLayerIdListGroupByDimId" resultType="java.lang.String">
+        SELECT lh.LAYER_ID FROM TG_TAG_LAYER_DATA lh
+                JOIN TG_TAG_DIMENSION_DATA dh ON lh.DATA_DIMENSION_ID = dh.ID
+        WHERE dh.DIMENSION_ID = #{dimId}
+        GROUP BY lh.LAYER_ID
+    </select>
+
+    <select id="getLayerByDataDimIdAndLayerId" resultType="com.kuangheng.cloud.tag.entity.TgTagLayerDataEntity">
+        SELECT <include refid="tgTagLayerHisColumn"/> FROM TG_TAG_LAYER_DATA
+        WHERE DATA_DIMENSION_ID = #{hisDimId} AND LAYER_ID = #{layerId}
+    </select>
+
+    <select id="getOneByLayerId" resultType="com.kuangheng.cloud.tag.entity.TgTagLayerDataEntity">
+        SELECT <include refid="tgTagLayerHisColumn"/> FROM TG_TAG_LAYER_DATA
+        where LAYER_ID = #{layerId} LIMIT 1
+    </select>
+
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.tag.dao.TgCustomerGroupDataDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.tag.entity.TgCustomerGroupDataEntity" id="tgCustomerGroupDataMap">
+        <result property="id" column="ID"/>
+        <result property="customerGroupId" column="CUSTOMER_GROUP_ID"/>
+        <result property="ruleContent" column="RULE_CONTENT"/>
+        <result property="excludeRuleContent" column="EXCLUDE_RULE_CONTENT"/>
+        <result property="sqlContent" column="SQL_CONTENT"/>
+        <result property="baseTime" column="BASE_TIME"/>
+        <result property="beginTime" column="BEGIN_TIME"/>
+        <result property="calcTime" column="CALC_TIME"/>
+        <result property="total" column="TOTAL"/>
+        <result property="calcStatus" column="CALC_STATUS"/>
+    </resultMap>
+
+    <sql id="tgCustomerGroupDataColumn">
+        ID,CUSTOMER_GROUP_ID,RULE_CONTENT,EXCLUDE_RULE_CONTENT,SQL_CONTENT,
+        BASE_TIME,BEGIN_TIME,CALC_TIME,TOTAL,CALC_STATUS
+    </sql>
+
+    <select id="queryForList" resultType="com.kuangheng.cloud.tag.entity.TgCustomerGroupDataEntity">
+        SELECT <include refid="tgCustomerGroupDataColumn"/> FROM TG_CUSTOMER_GROUP_DATA
+        WHERE CUSTOMER_GROUP_ID = #{customerGroupId}
+        <choose>
+            <when test="startDate !=null and startDate !='' and endDate !=null and endDate !=''">
+                AND (BASE_TIME >= #{startDate} AND BASE_TIME &lt;= #{endDate})
+            </when>
+            <otherwise>
+                AND DATE_SUB(CURDATE(), INTERVAL 15 DAY) &lt;= date(BASE_TIME)
+            </otherwise>
+        </choose>
+        ORDER BY BASE_TIME ASC
+    </select>
+
+    <select id="getCurrentTagHisEntity" resultType="com.kuangheng.cloud.tag.entity.TgCustomerGroupDataEntity">
+        SELECT <include refid="tgCustomerGroupDataColumn"/> FROM TG_CUSTOMER_GROUP_DATA
+        WHERE CUSTOMER_GROUP_ID = #{customerGroupId} ORDER BY BASE_TIME DESC LIMIT 1
+    </select>
+
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.customer.dao.AppInfoDao">
+
+    <select id="findAll" resultType="com.kuangheng.cloud.customer.entity.AppInfoEntity">
+        SELECT
+            T1.id, T1.customer_id, T1.app, T1.create_by, T1.create_time, T1.update_by, T1.update_time
+        FROM app_info T1
+        <where>
+            <if test="map.id !=null and !map.id">
+                AND T1.ID = #{map.id}
+            </if>
+            <if test="map.customerId !=null and !map.customerId">
+                AND T1.CUSTOMER_ID = #{map.customerId}
+            </if>
+            <if test="map.app !=null and !map.app">
+                AND T1.APP = #{map.app}
+            </if>
+        </where>
+    </select>
+</mapper>

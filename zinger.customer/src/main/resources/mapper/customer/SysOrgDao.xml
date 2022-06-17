@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuangheng.cloud.customer.dao.SysOrgDao">
+  <resultMap id="BaseResultMap" type="com.kuangheng.cloud.customer.dto.SysOrgDTO">
+    <id column="ID" javaType="java.lang.String" property="id" />
+    <result column="CODE" javaType="java.lang.String" property="code" />
+    <result column="NAME" javaType="java.lang.String" property="name" />
+    <result column="PARENT_ID" javaType="java.lang.String" property="parentId" />
+    <result column="LEADER" javaType="java.lang.String" property="leader" />
+    <result column="ADDRESS" javaType="java.lang.String" property="address" />
+    <result column="STATUS" javaType="java.lang.String" property="status" />
+    <result column="CREATE_BY" javaType="java.lang.String" property="createBy" />
+    <result column="CREATE_TIME" property="createTime" />
+    <result column="UPDATE_BY" javaType="java.lang.String" property="updateBy" />
+    <result column="UPDATE_TIME" property="updateTime" />
+    <result column="COMMENT" javaType="java.lang.String" property="comment" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, CODE, `NAME`, PARENT_ID, LEADER, ADDRESS, `STATUS`, CREATE_BY, CREATE_TIME, UPDATE_BY,
+    UPDATE_TIME, `COMMENT`
+  </sql>
+
+  <select id="getOrgDTOList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_org
+    <where>
+      and status = 1
+    </where>
+  </select>
+
+</mapper>

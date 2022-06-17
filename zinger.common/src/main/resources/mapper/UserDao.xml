@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuangheng.cloud.dao.UserDao">
+    <select id="search" resultType="com.kuangheng.cloud.entity.User">
+        select U.*, O.NAME as ORG_NAME FROM SYS_USER U
+        left join SYS_ORG O on O.ID=U.ORG_ID ${ew.customSqlSegment}
+    </select>
+
+</mapper>

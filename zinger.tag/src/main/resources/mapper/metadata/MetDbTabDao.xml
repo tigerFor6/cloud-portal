@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.metadata.dao.MetDbTabDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.metadata.entity.MetDbTabEntity" id="metDbTabMap">
+        <result property="id" column="ID"/>
+        <result property="dbName" column="DB_NAME"/>
+        <result property="tabName" column="TAB_NAME"/>
+        <result property="alias" column="ALIAS"/>
+        <result property="remark" column="REMARK"/>
+    </resultMap>
+
+    <sql id="metDbTabColumn">
+        ID,DB_NAME,ALIAS,TAB_NAME,REMARK
+    </sql>
+
+</mapper>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuangheng.cloud.customer.dao.SysUserDao">
+  <resultMap id="BaseResultMap" type="java.util.Map">
+    <id column="ID" jdbcType="BIGINT" property="id" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="FULLNAME" jdbcType="VARCHAR" property="fullname" />
+    <result column="PASSWORD" jdbcType="VARCHAR" property="password" />
+    <result column="GENDER" jdbcType="BOOLEAN" property="gender" />
+    <result column="PHONE" jdbcType="VARCHAR" property="phone" />
+    <result column="EMAIL" jdbcType="VARCHAR" property="email" />
+    <result column="EMP_ID" jdbcType="VARCHAR" property="empId" />
+    <result column="QQ" jdbcType="VARCHAR" property="qq" />
+    <result column="WECHAT_ID" jdbcType="VARCHAR" property="wechatId" />
+    <result column="DINGDING_ID" jdbcType="VARCHAR" property="dingdingId" />
+    <result column="ORG_ID" jdbcType="BIGINT" property="orgId" />
+    <result column="DEPT_ID" jdbcType="BIGINT" property="deptId" />
+    <result column="ROLE_ID" jdbcType="BIGINT" property="roleId" />
+    <result column="AVATAR" jdbcType="VARCHAR" property="avatar" />
+    <result column="LEVEL" javaType="java.lang.String" property="level" />
+    <result column="LAST_LOGIN_TIME" jdbcType="TIMESTAMP" property="lastLoginTime" />
+    <result column="LAST_LOGIN_IP" jdbcType="VARCHAR" property="lastLoginIp" />
+    <result column="STATUS" javaType="java.lang.String" property="status" />
+    <result column="CREATE_BY" jdbcType="BIGINT" property="createBy" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_BY" jdbcType="BIGINT" property="updateBy" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="COMMENT" jdbcType="VARCHAR" property="comment" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, `NAME`, FULLNAME, GENDER, PHONE, EMAIL, EMP_ID, QQ, WECHAT_ID, DINGDING_ID, 
+    ORG_ID, DEPT_ID, ROLE_ID, AVATAR, `LEVEL`, LAST_LOGIN_TIME, LAST_LOGIN_IP, `STATUS`, 
+    CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME, `COMMENT`
+  </sql>
+
+  <resultMap id="getNameByIdsMap" type="java.util.Map">
+    <id column="ID" jdbcType="VARCHAR" javaType="java.lang.String" property="id" />
+    <result column="FULLNAME" javaType="java.lang.String" property="fullname" />
+    <result column="NAME" javaType="java.lang.String" property="name" />
+    <result column="GENDER" javaType="java.lang.String" property="gender" />
+  </resultMap>
+  <select id="getNameByMap" resultMap="getNameByIdsMap">
+    select T1.ID, T1.FULLNAME, T1.NAME, T1.GENDER
+    from sys_user T1
+    <where>
+      <foreach collection='userList' item='user' open='AND T1.ID in (' separator=',' close=')'> #{user.userId}</foreach>
+    </where>
+  </select>
+
+  <select id="getNameByList" resultMap="getNameByIdsMap">
+    select T1.ID, T1.FULLNAME, T1.NAME, T1.GENDER
+    from sys_user T1
+    <where>
+      <foreach collection='list' item='userId' open='AND T1.ID in (' separator=',' close=')'> #{userId}</foreach>
+    </where>
+  </select>
+
+  <select id="getMemberPerformanceByOrg" resultMap="performanceResultMap">
+    SELECT U.ID,U.NAME,U.FULLNAME,U.EMP_ID,P.CUSTOMER_NUM AS relTotal,P.EVENT_NUM AS total,P.TASK_NUM AS PROCESS_TOTAL
+        FROM sys_user U
+        left JOIN user_performance P on U.id = P.user_id
+    WHERE
+    U.ORG_ID = #{map.orgId}
+    <if test='map.search!=null and map.search != ""'>
+      AND U.NAME like concat(concat('%', #{map.search}), '%')
+    </if>
+    <if test='map.optionId!=null and !map.optionId'>
+      AND U.ID != #{map.optionId}
+    </if>
+
+  </select>
+
+  <resultMap id="performanceResultMap" type="java.util.Map">
+    <id column="ID" javaType="java.lang.String" property="id" />
+    <result column="NAME" javaType="java.lang.String" property="name" />
+    <result column="FULLNAME" javaType="java.lang.String" property="fullname" />
+    <result column="EMP_ID" javaType="java.lang.String" property="emp_id" />
+    <result column="relTotal" javaType="java.lang.String" property="relTotal" />
+    <result column="TOTAL" javaType="java.lang.String" property="total" />
+    <result column="PROCESS_TOTAL" javaType="java.lang.String" property="processTotal" />
+  </resultMap>
+
+  <resultMap id="getActInfoByCreaterResultMap" type="java.util.Map">
+    <result column="TOTAL" javaType="java.lang.String" property="total" />
+    <result column="CREATE_BY" javaType="java.lang.String" property="createBy" />
+    <result column="PROCESS_TOTAL" javaType="java.lang.String" property="processTotal" />
+  </resultMap>
+  <select id="getActInfoByCreater" resultMap="getActInfoByCreaterResultMap">
+    select count(T1.create_by) total, T1.create_by, T2.process_total from activity_info T1
+    left join (
+      select count(create_by) process_total, create_by creater from activity_info
+        <where>
+          <foreach collection='map.users' item='user' open=' AND create_by in (' separator=',' close=')'>
+            #{user.id}
+          </foreach>
+          AND status = 1
+        </where>
+      ) T2 ON T2.creater = T1.create_by
+    <where>
+      <foreach collection='map.users' item='user' open=' create_by in (' separator=',' close=')'>
+        #{user.id}
+      </foreach>
+    </where>
+    group by T1.create_by;
+  </select>
+
+</mapper>

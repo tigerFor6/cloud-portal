@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.metadata.dao.MetRelationDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.metadata.entity.MetRelationEntity" id="metRelationMap">
+        <result property="id" column="ID"/>
+        <result property="type" column="TYPE"/>
+        <result property="name" column="NAME"/>
+        <result property="function" column="FUNCTION"/>
+        <result property="symbol" column="SYMBOL"/>
+        <result property="status" column="STATUS"/>
+        <result property="dataTypeSuitable" column="DATA_TYPE_SUITABLE"/>
+        <result property="webWidget" column="WEB_WIDGET"/>
+    </resultMap>
+
+    <sql id="metRelationColumn">
+        ID,`TYPE`,`NAME`,`FUNCTION`,SYMBOL,`STATUS`,DATA_TYPE_SUITABLE,WEB_WIDGET
+    </sql>
+
+    <select id="eventRelations" resultType="com.kuangheng.cloud.metadata.entity.MetRelationEntity">
+        SELECT
+            <include refid="metRelationColumn"/>
+        FROM MET_RELATION WHERE `STATUS` =1
+        <if test="type !=null and type !=''">
+            AND `TYPE` =#{type}
+        </if>
+    </select>
+
+</mapper>

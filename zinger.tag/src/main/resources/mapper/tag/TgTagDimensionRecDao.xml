@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kuangheng.cloud.tag.dao.TgTagDimensionRecDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kuangheng.cloud.tag.entity.TgTagDimensionRecEntity" id="tgTagDimensionRecMap">
+        <result property="id" column="ID"/>
+        <result property="dimensionId" column="DIMENSION_ID"/>
+        <result property="tagId" column="TAG_ID"/>
+        <result property="name" column="NAME"/>
+        <result property="sort" column="SORT"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateBy" column="UPDATE_BY"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="remark" column="REMARK"/>
+        <result property="tagRecId" column="TAG_REC_ID"/>
+        <result property="propertyId" column="PROPERTY_ID"/>
+    </resultMap>
+
+    <sql id="tgTagDimensionRecColumn">
+        ID,DIMENSION_ID,TAG_ID,NAME,SORT,CREATE_BY,CREATE_TIME,UPDATE_BY,UPDATE_TIME,REMARK,TAG_REC_ID,PROPERTY_ID
+    </sql>
+
+    <insert id="saveLog">
+        INSERT INTO tg_tag_dimension_rec(
+            ID,DIMENSION_ID,TAG_ID,`NAME`,SORT,CREATE_BY,CREATE_TIME,UPDATE_BY,UPDATE_TIME,REMARK,PROPERTY_ID,TAG_REC_ID
+        ) SELECT ${dimRecSnowId},ID,TAG_ID,`NAME`,SORT,CREATE_BY,CREATE_TIME,UPDATE_BY,UPDATE_TIME,REMARK,PROPERTY_ID,${tagRecSnowId}
+        FROM TG_TAG_DIMENSION WHERE ID = ${dimId}
+    </insert>
+
+    <select id="getMaxVersionByTagId" resultType="java.lang.Integer">
+        SELECT VERSION FROM tg_tag_dimension_rec WHERE DIMENSION_ID = #{dimId} ORDER BY VERSION DESC LIMIT 1  FOR UPDATE
+    </select>
+
+</mapper>
